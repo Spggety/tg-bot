@@ -68,13 +68,13 @@ export async function POST(req) {
         return cachedCsrf;
       }
 
-      const res = await fetch("https://id.ya.ru", {
+      const res = await fetch("https://passport.yandex.ru/pwl-yandex/auth/add?retpath=https%3A%2F%2Fid.yandex.ru%2F&noreturn=1&cause=auth&process_uuid=", {
         method: "GET",
       });
 
       const html = await res.text();
 
-      const token = html.match(/csrf[^"]*["']([^"']+)["']/)?.[1];
+      const token = html.match(/__CSRF__[^"]*["']([^"']+)["']/)?.[1];
 
       cachedCsrf = token;
       csrfExpiresAt = Date.now() + 5 * 60 * 1000; // 5 min cache
