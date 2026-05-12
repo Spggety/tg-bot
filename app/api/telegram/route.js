@@ -15,30 +15,17 @@ export async function POST(req) {
       body?.channel_post?.chat?.id ||
       body?.callback_query?.message?.chat?.id;
 
-    console.log("UPDATE RECEIVED:", JSON.stringify(body, null, 2));
-    console.log("MSG:", msg);
-    console.log("CHAT:", chatId);
+    console.log("UPDATE:", JSON.stringify(body, null, 2));
 
     if (!chatId) {
       return Response.json({ ok: true });
     }
 
     // =========================
-    // 🔹 /START обработка
+    // /start
     // =========================
-    if (msg === "/start") {
-      await fetch(
-        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: "👋 Привет! Отправь текст или JSON — я вытащу номера.",
-          }),
-        }
-      );
-
+    if (msg?.startsWith("/start")) {
+      await sendMessage(chatId, "👋 Отправь текст или JSON с номерами");
       return Response.json({ ok: true });
     }
 
@@ -49,7 +36,7 @@ export async function POST(req) {
     let numbers = [];
 
     // =========================
-    // 1️⃣ ПЫТАЕМСЯ JSON
+    // JSON parse
     // =========================
     try {
       const json = JSON.parse(msg);
@@ -59,31 +46,77 @@ export async function POST(req) {
           (item) => item?.numbersInfo?.map((n) => n.number) || []
         ) || [];
     } catch {
-      // =========================
-      // 2️⃣ FALLBACK REGEX
-      // =========================
+      // regex fallback
       const matches = msg.match(/\b\d{10,15}\b/g);
       if (matches) numbers = matches;
     }
 
-    const reply =
-      numbers.length > 0 ? numbers.join("\n") : "❌ Номера не найдены";
+    if (!numbers.length) {
+      await sendMessage(chatId, "❌ Номера не найдены");
+      return Response.json({ ok: true });
+    }
 
-    await fetch(
-      `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: reply,
-        }),
+    // =========================
+    // CHECK FUNCTION (ВАШ API)
+    // =========================
+    async function checkNumber(number) {
+      try {
+        const res = await fetch("https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrf-token": "be3e48079d5e0b5be314df202be7a79553822393:1778589762"
+          },
+          body: JSON.stringify({
+            phone_number: `+7${number}`,
+          }),
+        });
+
+        const data = await res.json();
+
+        return {
+          number,
+          ok: data?.hasAvailableAccounts === true,
+        };
+      } catch (e) {
+        return {
+          number,
+          ok: false,
+        };
       }
-    );
+    }
+
+    // =========================
+    // parallel check
+    // =========================
+    const results = await Promise.all(numbers.map(checkNumber));
+
+    const reply = results
+      .map((r) => `${r.ok ? "✔️" : "❌"} ${r.number}`)
+      .join("\n");
+
+    await sendMessage(chatId, reply);
 
     return Response.json({ ok: true });
   } catch (err) {
     console.error("ERROR:", err);
     return Response.json({ ok: false });
   }
+}
+
+// =========================
+// helper
+// =========================
+async function sendMessage(chatId, text) {
+  return fetch(
+    `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+      }),
+    }
+  );
 }
