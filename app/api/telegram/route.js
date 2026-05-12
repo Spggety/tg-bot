@@ -76,12 +76,12 @@ export async function POST(req) {
 
         return {
           number,
-          ok: data?.hasAvailableAccounts === true,
+          data
         };
       } catch (e) {
         return {
           number,
-          ok: false,
+          data
         };
       }
     }
