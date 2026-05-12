@@ -1,17 +1,23 @@
 export async function POST(req) {
   console.log("UPDATE RECEIVED:", JSON.stringify(body, null, 2));
+  console.log("BODY:", body);
+  console.log("MSG:", msg);
+  console.log("CHAT:", chatId);
   try {
     const body = await req.json();
 
     const msg =
       body?.message?.text ||
       body?.edited_message?.text ||
-      body?.channel_post?.text;
+      body?.channel_post?.text ||
+      body?.callback_query?.data ||
+      body?.message?.caption;
 
     const chatId =
       body?.message?.chat?.id ||
       body?.edited_message?.chat?.id ||
-      body?.channel_post?.chat?.id;
+      body?.channel_post?.chat?.id ||
+      body?.callback_query?.message?.chat?.id;
 
     if (!chatId || !msg) {
       return Response.json({ ok: true });
@@ -47,8 +53,8 @@ export async function POST(req) {
       },
     );
 
-    return Response.json({ ok: true });
+    return Response.json({ body });
   } catch {
-    return Response.json({ ok: true });
+    return Response.json({ body });
   }
 }
