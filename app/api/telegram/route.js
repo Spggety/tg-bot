@@ -1,19 +1,17 @@
-import { extractNumbers } from "@/lib/parseNumbers";
-
 export async function POST(req) {
   const body = await req.json();
 
-  const message = body?.message?.text;
   const chatId = body?.message?.chat?.id;
+  const text = body?.message?.text;
 
-  if (!message) {
+  if (!chatId) {
     return Response.json({ ok: true });
   }
 
-  let reply = "❌ Неверный формат";
+  let reply = "❌ Отправь JSON";
 
   try {
-    const json = JSON.parse(message);
+    const json = JSON.parse(text);
 
     const numbers =
       json?.availableForAdd?.flatMap(item =>
@@ -22,7 +20,7 @@ export async function POST(req) {
 
     reply = numbers.length ? numbers.join("\n") : "Пусто";
   } catch (e) {
-    reply = "❌ Отправь корректный JSON";
+    reply = "❌ Неверный JSON";
   }
 
   await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
