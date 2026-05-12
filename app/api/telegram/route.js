@@ -76,12 +76,18 @@ export async function POST(req) {
 
         return {
           number,
-          data
+          status: res.status,
+          ok: res.ok,
+          response: data, // 👈 ПОЛНЫЙ ОТВЕТ
         };
-      } catch (e) {
+      } catch (err) {
         return {
           number,
-          data
+          status: 500,
+          ok: false,
+          response: {
+            error: err.message,
+          },
         };
       }
     }
@@ -92,8 +98,16 @@ export async function POST(req) {
     const results = await Promise.all(numbers.map(checkNumber));
 
     const reply = results
-      .map((r) => `${r.ok } ${r.number}`) //? "✔️" : "❌"
-      .join("\n");
+      .map((r) => {
+        return (
+          `📱 ${r.number}\n` +
+          `📊 status: ${r.status}\n` +
+          `✅ ok: ${r.ok}\n` +
+          `📦 response:\n` +
+          `${JSON.stringify(r.response, null, 2)}`
+        );
+      })
+      .join("\n\n----------------\n\n");
 
     await sendMessage(chatId, reply);
 
@@ -103,6 +117,7 @@ export async function POST(req) {
     return Response.json({ ok: false });
   }
 }
+
 
 // =========================
 // helper
