@@ -68,7 +68,7 @@ export async function POST(req) {
         return cachedCsrf;
       }
 
-      const res = await fetch("https://passport.yandex.ru", {
+      const res = await fetch("https://id.ya.ru", {
         method: "GET",
       });
 
@@ -81,10 +81,8 @@ export async function POST(req) {
 
       return token;
     }
-
+    const csrf = await getCsrf();
     async function checkNumber(number) {
-      const csrf = await getCsrf();
-
       try {
         const res = await fetch(
           "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability",
@@ -126,6 +124,7 @@ export async function POST(req) {
     const reply = results
       .map((r) => {
         return (
+          `Т ${csrf}\n` +
           `📱 ${r.number}\n` +
           `📊 status: ${r.status}\n` +
           `✅ ok: ${r.ok}\n` +
