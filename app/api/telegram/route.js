@@ -43,7 +43,7 @@ export async function POST(req) {
 
       numbers =
         json?.availableForAdd?.flatMap(
-          (item) => item?.numbersInfo?.map((n) => n.number) || []
+          (item) => item?.numbersInfo?.map((n) => n.number) || [],
         ) || [];
     } catch {
       // regex fallback
@@ -59,16 +59,44 @@ export async function POST(req) {
     // =========================
     // CHECK FUNCTION (ВАШ API)
     // =========================
+
+    let cachedCsrf = null;
+    let csrfExpiresAt = 0;
+
+    async function getCsrf() {
+      if (cachedCsrf && Date.now() < csrfExpiresAt) {
+        return cachedCsrf;
+      }
+
+      const res = await fetch("https://passport.yandex.ru", {
+        method: "GET",
+      });
+
+      const html = await res.text();
+
+      const token = html.match(/csrf[^"]*["']([^"']+)["']/)?.[1];
+
+      cachedCsrf = token;
+      csrfExpiresAt = Date.now() + 5 * 60 * 1000; // 5 min cache
+
+      return token;
+    }
+
     async function checkNumber(number) {
+      const csrf = await getCsrf();
+
       try {
-        const res = await fetch("https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-csrf-token": "be3e48079d5e0b5be314df202be7a79553822393:1778589762"
+        const res = await fetch(
+          "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-csrf-token": csrf,
+            },
+            body: JSON.stringify({ phone_number: `+7${number}` }),
           },
-          "body": `{\"phone_number\":\"+7${number}\"}`,
-        });
+        );
 
         const data = await res.json();
 
@@ -116,7 +144,6 @@ export async function POST(req) {
   }
 }
 
-
 // =========================
 // helper
 // =========================
@@ -130,6 +157,6 @@ async function sendMessage(chatId, text) {
         chat_id: chatId,
         text,
       }),
-    }
+    },
   );
 }
