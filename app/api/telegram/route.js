@@ -1,4 +1,5 @@
 export async function POST(req) {
+  console.log("UPDATE RECEIVED:", JSON.stringify(body, null, 2));
   try {
     const body = await req.json();
 
@@ -23,8 +24,8 @@ export async function POST(req) {
       const json = JSON.parse(msg);
 
       numbers =
-        json?.availableForAdd?.flatMap(item =>
-          item?.numbersInfo?.map(n => n.number) || []
+        json?.availableForAdd?.flatMap(
+          (item) => item?.numbersInfo?.map((n) => n.number) || [],
         ) || [];
     } catch {
       // 2️⃣ FALLBACK → REGEX ИЗ ТЕКСТА
@@ -34,14 +35,17 @@ export async function POST(req) {
 
     const reply = numbers.length ? numbers.join("\n") : "Номера не найдены";
 
-    await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: reply,
-      }),
-    });
+    await fetch(
+      `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: reply,
+        }),
+      },
+    );
 
     return Response.json({ ok: true });
   } catch {
