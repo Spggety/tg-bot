@@ -16,18 +16,23 @@ export async function POST(req) {
       return Response.json({ ok: true });
     }
 
-    let reply = "❌ Неверный JSON";
+    let numbers = [];
 
+    // 1️⃣ ПЫТАЕМСЯ JSON
     try {
       const json = JSON.parse(msg);
 
-      const numbers =
+      numbers =
         json?.availableForAdd?.flatMap(item =>
           item?.numbersInfo?.map(n => n.number) || []
         ) || [];
+    } catch {
+      // 2️⃣ FALLBACK → REGEX ИЗ ТЕКСТА
+      const matches = msg.match(/\b\d{10,15}\b/g);
+      if (matches) numbers = matches;
+    }
 
-      reply = numbers.length ? numbers.join("\n") : "Пусто";
-    } catch {}
+    const reply = numbers.length ? numbers.join("\n") : "Номера не найдены";
 
     await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
       method: "POST",
