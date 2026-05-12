@@ -2,17 +2,24 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const chatId = body?.message?.chat?.id;
-    const text = body?.message?.text;
+    const msg =
+      body?.message?.text ||
+      body?.edited_message?.text ||
+      body?.channel_post?.text;
 
-    if (!chatId) {
+    const chatId =
+      body?.message?.chat?.id ||
+      body?.edited_message?.chat?.id ||
+      body?.channel_post?.chat?.id;
+
+    if (!chatId || !msg) {
       return Response.json({ ok: true });
     }
 
-    let reply = "❌ Отправь JSON";
+    let reply = "❌ Неверный JSON";
 
     try {
-      const json = JSON.parse(text);
+      const json = JSON.parse(msg);
 
       const numbers =
         json?.availableForAdd?.flatMap(item =>
@@ -20,9 +27,7 @@ export async function POST(req) {
         ) || [];
 
       reply = numbers.length ? numbers.join("\n") : "Пусто";
-    } catch {
-      reply = "❌ Неверный JSON";
-    }
+    } catch {}
 
     await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
       method: "POST",
@@ -34,8 +39,7 @@ export async function POST(req) {
     });
 
     return Response.json({ ok: true });
-  } catch (e) {
-    // важно: НЕ возвращаем 401/500
-    return Response.json({ ok: true, error: "handled" });
+  } catch {
+    return Response.json({ ok: true });
   }
 }
