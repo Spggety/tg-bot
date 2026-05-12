@@ -1,8 +1,4 @@
 export async function POST(req) {
-  console.log("UPDATE RECEIVED:", JSON.stringify(body, null, 2));
-  console.log("BODY:", body);
-  console.log("MSG:", msg);
-  console.log("CHAT:", chatId);
   try {
     const body = await req.json();
 
@@ -19,27 +15,59 @@ export async function POST(req) {
       body?.channel_post?.chat?.id ||
       body?.callback_query?.message?.chat?.id;
 
-    if (!chatId || !msg) {
+    console.log("UPDATE RECEIVED:", JSON.stringify(body, null, 2));
+    console.log("MSG:", msg);
+    console.log("CHAT:", chatId);
+
+    if (!chatId) {
+      return Response.json({ ok: true });
+    }
+
+    // =========================
+    // 🔹 /START обработка
+    // =========================
+    if (msg === "/start") {
+      await fetch(
+        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: "👋 Привет! Отправь текст или JSON — я вытащу номера.",
+          }),
+        }
+      );
+
+      return Response.json({ ok: true });
+    }
+
+    if (!msg) {
       return Response.json({ ok: true });
     }
 
     let numbers = [];
 
+    // =========================
     // 1️⃣ ПЫТАЕМСЯ JSON
+    // =========================
     try {
       const json = JSON.parse(msg);
 
       numbers =
         json?.availableForAdd?.flatMap(
-          (item) => item?.numbersInfo?.map((n) => n.number) || [],
+          (item) => item?.numbersInfo?.map((n) => n.number) || []
         ) || [];
     } catch {
-      // 2️⃣ FALLBACK → REGEX ИЗ ТЕКСТА
+      // =========================
+      // 2️⃣ FALLBACK REGEX
+      // =========================
       const matches = msg.match(/\b\d{10,15}\b/g);
       if (matches) numbers = matches;
     }
 
-    const reply = numbers.length ? numbers.join("\n") : "Номера не найдены";
+    const reply =
+      numbers.length > 0 ? numbers.join("\n") : "❌ Номера не найдены";
 
     await fetch(
       `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
@@ -50,11 +78,12 @@ export async function POST(req) {
           chat_id: chatId,
           text: reply,
         }),
-      },
+      }
     );
 
-    return Response.json({ body });
-  } catch {
-    return Response.json({ body });
+    return Response.json({ ok: true });
+  } catch (err) {
+    console.error("ERROR:", err);
+    return Response.json({ ok: false });
   }
 }
