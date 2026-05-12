@@ -67,9 +67,7 @@ export async function POST(req) {
             "Content-Type": "application/json",
             "x-csrf-token": "be3e48079d5e0b5be314df202be7a79553822393:1778589762"
           },
-          body: JSON.stringify({
-            phone_number: `+7${number}`,
-          }),
+          "body": `{\"phone_number\":\"+7${number}\"}`,
         });
 
         const data = await res.json();
