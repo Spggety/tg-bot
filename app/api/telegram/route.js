@@ -92,7 +92,7 @@ export async function POST(req) {
     const results = await Promise.all(numbers.map(checkNumber));
 
     const reply = results
-      .map((r) => `${r.ok ? "✔️" : "❌"} ${r.number}`)
+      .map((r) => `${r.ok } ${r.number}`) //? "✔️" : "❌"
       .join("\n");
 
     await sendMessage(chatId, reply);
