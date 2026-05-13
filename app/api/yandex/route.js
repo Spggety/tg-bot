@@ -19,7 +19,7 @@ export async function GET() {
 
     const page = await browser.newPage();
 
-    await page.goto("https://example.com", {
+    await page.goto("https://id.ya.ru", {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
