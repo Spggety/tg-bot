@@ -17,7 +17,7 @@ export async function GET() {
   const csrf = match[1];
 
   const apiRes = await fetch(
-    "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability",
+    "https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability",
     {
       method: "POST",
       headers: {
