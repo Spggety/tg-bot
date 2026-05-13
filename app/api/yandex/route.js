@@ -22,13 +22,9 @@ export async function GET() {
     return new Response(html, {
       headers: { "content-type": "text/html" },
     });
-
   } catch (e) {
-    return new Response(
-      JSON.stringify({ error: e.message }),
-      { status: 500 }
-    );
-
+    console.log(e);
+    return new Response(JSON.stringify({ error: e.message }), { status: 500 });
   } finally {
     if (browser) await browser.close();
   }
