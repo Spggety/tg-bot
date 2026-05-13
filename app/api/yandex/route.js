@@ -30,22 +30,22 @@ export async function GET() {
   const csrf = match[1];
 
 //   // 3. Делаем API запрос в ТОЙ ЖЕ сессии
-  const apiRes = await fetch(
-    `https://api.scraperapi.com/?api_key=${API_KEY}&url=${encodeURIComponent(
-      "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability"
-    )}&session_number=${session}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-csrf-token": csrf,
-        Cookie: setCookie, // 🔥 ключевой момент
-      },
-      body: JSON.stringify({
-        phone_number: "+79502514756",
-      }),
-    }
-  );
+//   const apiRes = await fetch(
+//     `https://api.scraperapi.com/?api_key=${API_KEY}&url=${encodeURIComponent(
+//       "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability"
+//     )}&session_number=${session}`,
+//     {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         "x-csrf-token": csrf,
+//         Cookie: setCookie, // 🔥 ключевой момент
+//       },
+//       body: JSON.stringify({
+//         phone_number: "+79502514756",
+//       }),
+//     }
+//   );
 
 //   const data = await apiRes.text();
 
