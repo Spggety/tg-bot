@@ -1,16 +1,25 @@
 export async function GET() {
-  const res = await fetch(
-    "https://passport.yandex.ru/pwl-yandex",
-    {
-      redirect: "manual",
-      headers: {
-        cookie: "...",
-        referer: "https://passport.yandex.ru/",
-        "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/148 Safari/537.36",
-      },
-    }
-  );
+  const res = await fetch("https://passport.yandex.ru/pwl-yandex", {
+    headers: {
+      accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "accept-language": "ru",
+      "cache-control": "max-age=0",
+      priority: "u=0, i",
+      "sec-ch-prefers-color-scheme": "light",
+      "sec-ch-ua":
+        '"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "sec-fetch-dest": "document",
+      "sec-fetch-mode": "navigate",
+      "sec-fetch-site": "same-origin",
+      "sec-fetch-user": "?1",
+      "upgrade-insecure-requests": "1",
+    },
+    body: null,
+    method: "GET",
+  });
 
   return Response.json({
     status: res.status,
