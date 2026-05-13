@@ -5,7 +5,6 @@ export async function GET() {
   try {
     const res = await fetch("https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex", {
       signal: controller.signal,
-      redirect: "follow",
       headers: {
         "user-agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
