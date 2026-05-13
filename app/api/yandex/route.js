@@ -1,29 +1,29 @@
 export async function GET() {
-  const res = await fetch("https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex", {
-    headers: {
-      accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-      "accept-language": "ru",
-      "cache-control": "max-age=0",
-      priority: "u=0, i",
-      "sec-ch-prefers-color-scheme": "light",
-      "sec-ch-ua":
-        '"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"',
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": '"Windows"',
-      "sec-fetch-dest": "document",
-      "sec-fetch-mode": "navigate",
-      "sec-fetch-site": "same-origin",
-      "sec-fetch-user": "?1",
-      "upgrade-insecure-requests": "1",
-    },
-    body: null,
-    method: "GET",
-  });
+  const res = await fetch(
+    "https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex",
+    {
+      headers: {
+        accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "accept-language": "ru",
+      },
+      method: "GET",
+    }
+  );
 
-  return Response.json({
-    status: res.status,
-    headers: Object.fromEntries(res.headers),
-    text: await res.text(),
-  });
+  const html = await res.text();
+
+  // 🔥 достаём CSRF
+  const match = html.match(/window\.__CSRF__\s*=\s*"([^"]+)"/);
+
+  if (!match) {
+    return Response.json(
+      { error: "CSRF not found" },
+      { status: 500 }
+    );
+  }
+
+  const csrf = match[1];
+
+  return Response.json(csrf);
 }
