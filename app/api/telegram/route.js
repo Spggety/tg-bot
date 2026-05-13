@@ -64,30 +64,22 @@ export async function POST(req) {
     let csrfExpiresAt = 0;
 
     async function getCsrf() {
-      const res = await fetch(
-        "https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex",
-        {
-          headers: {
-            accept:
-              "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            "accept-language": "ru",
-          },
-          method: "GET",
-        },
-      );
+      if (cachedCsrf && Date.now() < csrfExpiresAt) {
+        return cachedCsrf;
+      }
+
+      const res = await fetch("https://passport.yandex.ru/pwl-yandex/auth/add?retpath=https%3A%2F%2Fid.yandex.ru%2F&noreturn=1&cause=auth&process_uuid=", {
+        method: "GET",
+      });
 
       const html = await res.text();
 
-      // 🔥 достаём CSRF
-      const match = html.match(/window\.__CSRF__\s*=\s*"([^"]+)"/);
+      const token = html.match(/__CSRF__[^"]*["']([^"']+)["']/)?.[1];
 
-      if (!match) {
-        return { error: "CSRF not found" }
-      }
+      cachedCsrf = token;
+      csrfExpiresAt = Date.now() + 5 * 60 * 1000; // 5 min cache
 
-      const csrf = match[1];
-
-      return csrf;
+      return token;
     }
     const csrf = await getCsrf();
     async function checkNumber(number) {
@@ -127,17 +119,17 @@ export async function POST(req) {
     // =========================
     // parallel check
     // =========================
-    const results = await Promise.all(numbers.map(checkNumber));
+    // const results = await Promise.all(numbers.map(checkNumber));
 
-    const reply = results
+    const reply = numbers
       .map((r) => {
         return (
-          `Т ${csrf}\n` +
-          `📱 ${r.number}\n` +
-          `📊 status: ${r.status}\n` +
-          `✅ ok: ${r.ok}\n` +
-          `📦 response:\n` +
-          `${JSON.stringify(r.response, null, 2)}`
+          // `Т ${csrf}\n` +
+          `📱 ${r.number}\n` 
+          // `📊 status: ${r.status}\n` +
+          // `✅ ok: ${r.ok}\n` +
+          // `📦 response:\n` +
+          // `${JSON.stringify(r.response, null, 2)}`
         );
       })
       .join("\n\n----------------\n\n");
