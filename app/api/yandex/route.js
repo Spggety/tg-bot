@@ -34,7 +34,7 @@ export async function GET() {
               "Content-Type": "application/json",
               "x-csrf-token": csrf,
             },
-            body: JSON.stringify({ phone_number: `+7${number}` }),
+            body: JSON.stringify({ phone_number: `+79502514756` }),
           },
         );
 
