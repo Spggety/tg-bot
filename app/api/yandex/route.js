@@ -1,6 +1,7 @@
 export async function GET() {
   const res = await fetch("https://passport.yandex.ru/pwl-yandex", {
     headers: {
+      referer: "https://passport.yandex.ru/",
       accept:
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
       "accept-language": "ru",
@@ -20,10 +21,14 @@ export async function GET() {
     body: null,
     method: "GET",
   });
-  const html = await res.text();
+  let html = await res.text();
+
+  html = html.replace(
+    "<head>",
+    `<head><base href="https://passport.yandex.ru/">`,
+  );
 
   return new Response(html, {
-    status: res.status,
     headers: {
       "content-type": "text/html; charset=utf-8",
     },
