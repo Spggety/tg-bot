@@ -27,7 +27,7 @@ export async function GET() {
     );
   }
 
-  const csrf = match[1].csrf;
+  const csrf = match[1];
 
 //   // 3. Делаем API запрос в ТОЙ ЖЕ сессии
 //   const apiRes = await fetch(
@@ -49,7 +49,7 @@ export async function GET() {
 
 //   const data = await apiRes.text();
 
-  return Response.json({
+  return Response({
     csrf,
     // data: JSON.parse(data),
   });
