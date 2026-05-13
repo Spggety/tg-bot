@@ -40,11 +40,23 @@ async function proxy(req, params) {
     body = await req.arrayBuffer();
   }
 
-  const res = await fetch(url, {
-    method: req.method,
-    headers,
-    body,
+ const res = await fetch(url, {
+  method: req.method,
+  headers,
+  body,
+  redirect: "manual",
+});
+
+if ([301, 302, 303, 307, 308].includes(res.status)) {
+  const location = res.headers.get("location");
+
+  return new Response(null, {
+    status: res.status,
+    headers: {
+      Location: location,
+    },
   });
+}
 
   // читаем ответ
   const buffer = await res.arrayBuffer();
