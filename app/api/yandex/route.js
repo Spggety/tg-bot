@@ -1,10 +1,23 @@
 export async function GET() {
+  const API_KEY = "8a1ae09bba8bc87e55c9d15366e8ef69";
+  const session = "12345"; // важно: фиксируем сессию
+
+  // 1. Получаем HTML + cookies в ОДНОЙ сессии
   const pageRes = await fetch(
-    "https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https%3A%2F%2Fpassport.yandex.ru%2Fpwl-yandex%2Fauth%2Fadd&device_type=mobile&follow_redirect=false&render=true"
+    `https://api.scraperapi.com/?api_key=${API_KEY}&url=${encodeURIComponent(
+      "https://passport.yandex.ru/pwl-yandex/auth/add"
+    )}&device_type=mobile&render=true&session_number=${session}`,
+    {
+      method: "GET",
+    }
   );
 
   const html = await pageRes.text();
 
+  // cookies из ответа ScraperAPI
+  const setCookie = pageRes.headers.get("set-cookie") || "";
+
+  // 2. Достаём CSRF
   const match = html.match(/window\.__CSRF__\s*=\s*"([^"]+)"/);
 
   if (!match) {
@@ -16,19 +29,28 @@ export async function GET() {
 
   const csrf = match[1];
 
+  // 3. Делаем API запрос в ТОЙ ЖЕ сессии
   const apiRes = await fetch(
-    "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability",
+    `https://api.scraperapi.com/?api_key=${API_KEY}&url=${encodeURIComponent(
+      "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability"
+    )}&session_number=${session}`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-csrf-token": csrf,
+        Cookie: setCookie, // 🔥 ключевой момент
       },
-      body: JSON.stringify({ phone_number: "+79502514756" }),
+      body: JSON.stringify({
+        phone_number: "+79502514756",
+      }),
     }
   );
 
-  const data = await apiRes.json();
+  const data = await apiRes.text();
 
-  return Response.json(data);
+  return Response.json({
+    csrf,
+    data: JSON.parse(data),
+  });
 }
