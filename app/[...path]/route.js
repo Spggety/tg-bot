@@ -44,7 +44,6 @@ async function proxy(req, params) {
     method: req.method,
     headers,
     body,
-    redirect: "manual"
   });
 
   // читаем ответ
