@@ -1,24 +1,38 @@
 import { chromium } from "playwright-core";
-import chromiumPkg from "@sparticuz/chromium";
+import chromium from "@sparticuz/chromium-min";
 
 export async function GET() {
-  const browser = await chromium.launch({
-    args: chromiumPkg.args,
-    executablePath: await chromiumPkg.executablePath(),
-    headless: chromiumPkg.headless,
-  });
+  let browser = null;
 
-  const page = await browser.newPage();
+  try {
+    browser = await chromium.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
 
-  await page.goto("https://passport.yandex.ru/pwl-yandex", {
-    waitUntil: "networkidle",
-  });
+    const page = await browser.newPage();
 
-  const html = await page.content();
+    await page.goto("https://example.com", {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
 
-  await browser.close();
+    const html = await page.content();
 
-  return new Response(html, {
-    headers: { "content-type": "text/html" },
-  });
+    return new Response(html, {
+      headers: { "content-type": "text/html" },
+    });
+
+  } catch (e) {
+    return new Response(
+      JSON.stringify({
+        error: e.message,
+      }),
+      { status: 500 }
+    );
+
+  } finally {
+    if (browser) await browser.close();
+  }
 }
