@@ -1,12 +1,12 @@
 export async function GET() {
   const API_KEY = "8a1ae09bba8bc87e55c9d15366e8ef69";
-  const session = "12345"; // важно: фиксируем сессию
+  const session = "1"; // важно: фиксируем сессию
 
   // 1. Получаем HTML + cookies в ОДНОЙ сессии
   const pageRes = await fetch(
     `https://api.scraperapi.com/?api_key=${API_KEY}&url=${encodeURIComponent(
       "https://passport.yandex.ru/pwl-yandex/auth/add"
-    )}&device_type=mobile&render=true&session_number=${session}`,
+    )}&device_type=mobile&render=false&session_number=${session}`,
     {
       method: "GET",
     }
