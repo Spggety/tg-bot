@@ -87,7 +87,7 @@ export async function POST(req) {
 
       const csrf = match[1];
 
-      return Response.json(csrf);
+      return csrf;
     }
     const csrf = await getCsrf();
     async function checkNumber(number) {
