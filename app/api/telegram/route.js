@@ -125,7 +125,7 @@ export async function POST(req) {
       .map((r) => {
         return (
           // `Т ${csrf}\n` +
-          `7${r}\n` 
+          `7${r} \n` 
           // `📊 status: ${r.status}\n` +
           // `✅ ok: ${r.ok}\n` +
           // `📦 response:\n` +
