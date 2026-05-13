@@ -1,20 +1,24 @@
-export async function GET(req) {
-  const target =
-    "https://passport.yandex.ru/pwl-yandex";
+import { chromium } from "playwright-core";
+import chromiumPkg from "@sparticuz/chromium";
 
-  const res = await fetch(target, {
-    headers: {
-      "user-agent":
-        req.headers.get("user-agent") || "",
-    },
+export async function GET() {
+  const browser = await chromium.launch({
+    args: chromiumPkg.args,
+    executablePath: await chromiumPkg.executablePath(),
+    headless: chromiumPkg.headless,
   });
 
-  const html = await res.text();
+  const page = await browser.newPage();
+
+  await page.goto("https://passport.yandex.ru/pwl-yandex", {
+    waitUntil: "networkidle",
+  });
+
+  const html = await page.content();
+
+  await browser.close();
 
   return new Response(html, {
-    status: res.status,
-    headers: {
-      "content-type": "text/html",
-    },
+    headers: { "content-type": "text/html" },
   });
 }
