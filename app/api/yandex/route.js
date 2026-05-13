@@ -1,6 +1,6 @@
 export async function GET() {
   const pageRes = await fetch(
-    "https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex"
+    "https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https%3A%2F%2Fpassport.yandex.ru%2Fpwl-yandex%2Fauth%2Fadd&device_type=mobile&follow_redirect=false&render=true"
   );
 
   const html = await pageRes.text();
