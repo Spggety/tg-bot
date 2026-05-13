@@ -125,14 +125,14 @@ export async function POST(req) {
       .map((r) => {
         return (
           // `Т ${csrf}\n` +
-          `📱 ${r}\n` 
+          `7${r}\n` 
           // `📊 status: ${r.status}\n` +
           // `✅ ok: ${r.ok}\n` +
           // `📦 response:\n` +
           // `${JSON.stringify(r.response, null, 2)}`
         );
       })
-      .join("\n\n----------------\n\n");
+      // .join("\n\n----------------\n\n");
 
     await sendMessage(chatId, reply);
 
