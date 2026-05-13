@@ -1,6 +1,6 @@
 export async function GET() {
   const res = await fetch(
-    "https://passport.yandex.ru/pwl-yandex/auth/add?...",
+    "https://passport.yandex.ru/pwl-yandex",
     {
       redirect: "manual",
       headers: {
