@@ -1,11 +1,11 @@
-import { chromium } from "playwright-core";
+import { chromium as playwrightChromium } from "playwright-core";
 import chromium from "@sparticuz/chromium-min";
 
 export async function GET() {
   let browser = null;
 
   try {
-    browser = await chromium.launch({
+    browser = await playwrightChromium.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
@@ -15,7 +15,6 @@ export async function GET() {
 
     await page.goto("https://example.com", {
       waitUntil: "domcontentloaded",
-      timeout: 30000,
     });
 
     const html = await page.content();
@@ -26,9 +25,7 @@ export async function GET() {
 
   } catch (e) {
     return new Response(
-      JSON.stringify({
-        error: e.message,
-      }),
+      JSON.stringify({ error: e.message }),
       { status: 500 }
     );
 
