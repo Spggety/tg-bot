@@ -122,16 +122,17 @@ export async function POST(req) {
     // const results = await Promise.all(numbers.map(checkNumber));
 
     const reply = numbers
-      .map((r) => {
-        return (
-          // `Т ${csrf}\n` +
-          `7${r} \n` 
-          // `📊 status: ${r.status}\n` +
-          // `✅ ok: ${r.ok}\n` +
-          // `📦 response:\n` +
-          // `${JSON.stringify(r.response, null, 2)}`
-        );
-      })
+      // .map((r) => {
+      //   return (
+      //     // `Т ${csrf}\n` +
+      //     `7${r}` 
+      //     // `📊 status: ${r.status}\n` +
+      //     // `✅ ok: ${r.ok}\n` +
+      //     // `📦 response:\n` +
+      //     // `${JSON.stringify(r.response, null, 2)}`
+      //   );
+      // })
+      .join("\n")
       // .join("\n\n----------------\n\n");
 
     await sendMessage(chatId, reply);
