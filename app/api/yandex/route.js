@@ -1,33 +1,29 @@
 export async function GET() {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
-  const proxyUrl = "http://modeler_3xguEX:IUQRZfWzUyPv@192.121.87.135:13438";
-  try {
-    const res = await fetch("https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex", {
-      signal: controller.signal,
-      headers: {
-        "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-        "accept":
-          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      },
-    });
+  const res = await fetch("https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex", {
+    headers: {
+      accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "accept-language": "ru",
+      "cache-control": "max-age=0",
+      priority: "u=0, i",
+      "sec-ch-prefers-color-scheme": "light",
+      "sec-ch-ua":
+        '"Chromium";v="148", "Google Chrome";v="148", "Not/A)Brand";v="99"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "sec-fetch-dest": "document",
+      "sec-fetch-mode": "navigate",
+      "sec-fetch-site": "same-origin",
+      "sec-fetch-user": "?1",
+      "upgrade-insecure-requests": "1",
+    },
+    body: null,
+    method: "GET",
+  });
 
-    const html = await res.text();
-
-    return new Response(html, {
-      headers: {
-        "content-type": "text/html; charset=utf-8",
-      },
-    });
-
-  } catch (e) {
-    return new Response(
-      JSON.stringify({ error: e.message }),
-      { status: 500 }
-    );
-
-  } finally {
-    clearTimeout(timeout);
-  }
+  return Response.json({
+    status: res.status,
+    headers: Object.fromEntries(res.headers),
+    text: await res.text(),
+  });
 }
