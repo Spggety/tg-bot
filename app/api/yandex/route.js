@@ -11,7 +11,7 @@ export async function GET(req) {
 
   const html = await res.text();
 
-  return new Response(html+"djsfsfgesf", {
+  return new Response(<html><div>sdfinaisoghawgg</div></html>, {
     status: res.status,
     headers: {
       "content-type": "text/html",
