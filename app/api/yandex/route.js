@@ -20,10 +20,12 @@ export async function GET() {
     body: null,
     method: "GET",
   });
+  const html = await res.text();
 
-  return Response.json({
+  return new Response(html, {
     status: res.status,
-    headers: Object.fromEntries(res.headers),
-    text: await res.text(),
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+    },
   });
 }
