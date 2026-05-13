@@ -1,9 +1,9 @@
 export async function GET() {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
-
+  const proxyUrl = "http://modeler_3xguEX:IUQRZfWzUyPv@192.121.87.135:13438";
   try {
-    const res = await fetch("https://passport.yandex.ru/pwl-yandex", {
+    const res = await fetch("https://api.scraperapi.com/?api_key=8a1ae09bba8bc87e55c9d15366e8ef69&url=https://passport.yandex.ru/pwl-yandex", {
       signal: controller.signal,
       redirect: "follow",
       headers: {
