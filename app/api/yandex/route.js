@@ -3,7 +3,7 @@ export async function GET() {
   const timeout = setTimeout(() => controller.abort(), 10000);
 
   try {
-    const res = await fetch("https://example.com", {
+    const res = await fetch("https://passport.yandex.ru/pwl-yandex", {
       signal: controller.signal,
       redirect: "follow",
       headers: {
