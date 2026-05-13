@@ -51,6 +51,6 @@ export async function GET() {
 
   return Response.json({
     csrf,
-    data: JSON.parse(data),
+    // data: JSON.parse(data),
   });
 }
