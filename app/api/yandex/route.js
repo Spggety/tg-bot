@@ -25,5 +25,20 @@ export async function GET() {
 
   const csrf = match[1];
 
-  return Response.json(csrf);
+
+  const res = await fetch(
+          "https://passport.yandex.ru/pwl-yandex/api/passport/suggest/check_availability",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-csrf-token": csrf,
+            },
+            body: JSON.stringify({ phone_number: `+7${number}` }),
+          },
+        );
+
+        const data = await res.json();
+
+  return data
 }
